@@ -32,7 +32,7 @@ jobs:
           submodules: recursive
 
       # Setup Python for AMBuild
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@v5
         name: Setup Python 3.8
         with:
           python-version: 3.8
@@ -41,9 +41,9 @@ jobs:
           python -m pip install --upgrade pip setuptools wheel
           pip install git+https://github.com/alliedmodders/ambuild
 
-      - name: Build only for x64 on macOS
+      - name: Build universal x64/arm64 on macOS
         if: startsWith(runner.os, 'macOS')
-        run: echo "ARCH=x86_64" >> $GITHUB_ENV
+        run: echo "ARCH=x86_64,arm64" >> $GITHUB_ENV
 
       - name: Install Linux dependencies
         if: startsWith(runner.os, 'Linux')
@@ -73,7 +73,7 @@ jobs:
           echo "SM_VERSION=$(cat ../product.version)" >> $GITHUB_ENV
 
       - name: Archive tooling
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: sourcemod-tooling-${{ env.SM_VERSION }}-${{ matrix.os_short }}
           path: build/package

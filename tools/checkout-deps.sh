@@ -95,7 +95,7 @@ fi
 checkout ()
 {
   if [ ! -d "$name" ]; then
-    git clone $repo -b $branch $name
+    git clone --recursive $repo -b $branch $name
     if [ -n "$origin" ]; then
       cd $name
       git remote set-url origin $origin
@@ -152,6 +152,12 @@ do
   branch=$sdk
   checkout
 done
+
+name=hl2sdk-mock
+branch=master
+repo="https://github.com/alliedmodders/hl2sdk-mock"
+origin=
+checkout
 
 python_cmd=`command -v python3`
 if [ -z "$python_cmd" ]; then
