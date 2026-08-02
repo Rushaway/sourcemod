@@ -104,35 +104,6 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-build-${{ env.cache-name }}-mysql${{ env.MYSQL_VERSION }}-mmsource${{ env.MMSOURCE_VERSION }}-
             ${{ runner.os }}-build-${{ env.cache-name }}-mysql${{ env.MYSQL_VERSION }}-
-      
-      - name: Install dependencies
-        shell: bash
-        env:
-          MAXMIND_LICENSE_KEY: ${{ secrets.MAXMIND_LICENSE_KEY }}
-        run: |
-          mkdir -p '${{ steps.path_helper.outputs.dependencies }}'
-          cd '${{ steps.path_helper.outputs.dependencies }}'
-
-          # Satisfy checkout-deps requirement for a "sourcemod" folder.
-          mkdir -p sourcemod
-          ../sourcemod/tools/checkout-deps.sh -s ${{ join(fromJson(steps.sdk_list.outputs.sdk_list), ',') }}
-
-          if [ -z "$MAXMIND_LICENSE_KEY" ]; then
-            echo "::error::MAXMIND_LICENSE_KEY secret is not configured."
-            exit 1
-          fi
-
-          geotmpdir=$(mktemp -d)
-          geotar="$geotmpdir/GeoLite2-City.tar.gz"
-          curl -fsSL "https://download.maxmind.com/app/geoip_download?edition_id=GeoLite2-City&license_key=$MAXMIND_LICENSE_KEY&suffix=tar.gz" -o "$geotar"
-          tar -xzf "$geotar" -C "$geotmpdir"
-          geommdb=$(find "$geotmpdir" -type f -name 'GeoLite2-City.mmdb' | head -n 1)
-          if [ -z "$geommdb" ]; then
-            echo "::error::GeoLite2-City.mmdb not found in downloaded MaxMind archive."
-            exit 1
-          fi
-          cp "$geommdb" '${{ steps.path_helper.outputs.dependencies }}/GeoLite2-City.mmdb'
-          rm -rf "$geotmpdir"
 
       - name: Build
         working-directory: sourcemod
